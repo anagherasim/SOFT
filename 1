@@ -1,0 +1,50 @@
+1.1:
+a)
+A=zeros(5,5);
+B=zeros(5,5);
+C=zeros(5,5);
+for i = 1:5
+    for j = 1:5
+        A(i,j) = i.^2;
+        B(i,j) = i+j;
+        C(i,j) = min(i,j);
+    end
+end
+disp(A)
+disp(" ")
+disp(B)
+disp(" ")
+disp(C)
+
+sau
+
+A=zeros(5,5);
+B=zeros(5,5);
+C=zeros(5,5);
+j = 0;
+i = 1:5;
+A(:,1)= i.*i;
+A(:,2)= i.*i;
+A(:,3)= i.*i;
+A(:,4)= i.*i;
+A(:,5)= i.*i;
+A
+for i = 1:5
+        B(i,:) = i+j;
+        C(i,:) = min(i,j);
+end
+disp(" ")
+disp(B)
+disp(" ")
+disp(C)
+
+b)
+u = [1 2 3];
+v = [4 5 6];
+x = [1 2 1];
+w = u;
+y = v;
+dot(u,v)
+dot(u,x.*x)
+z=w.*x;
+dot(z,y)

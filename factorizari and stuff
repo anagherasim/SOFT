@@ -184,3 +184,50 @@ end
 
 Funcția 6
 %
+
+
+
+
+
+
+
+%
+function H = factorizareCholesky(A)
+%{ 
+
+Aceasta functie returnează matricea H cu proprietatea A = H'H
+Date de intrare: 
+A: n x n simetrică și semipozitivi definită
+
+Date de iesire: 
+H: n x n inferior triunghiulară, nesingulară
+
+%}
+
+n = size(A,1);
+H = zeros(n);
+  
+% elementele de pe diagonala principala i = j
+% a_jj = linia_j*coloana_j
+%      = h_j1^2 + h_j2^2 + ... + h_jj^2 (j termeni, j>=i+1)
+  
+% elementele de sub diagonala principala, i>j
+% a_ij = linia_i*coloana_j 
+%      = h_i1 h_j1 + h_i2 h_j2 + ... + h_ij h_jj (j termeni)
+for j = 1:n % parcurgem de la coloana 1 la n
+    % Calculăm elementele de pe diagonala principală, i = j
+    H(j,j) = A(j,j);
+    for k = 1:j-1
+        H(j,j) = H(j,j) - H(j,k)^2;
+    end
+    H(j,j) = H(j,j)^(1/2);
+    % Calculăm elementele de sub diagonala principală, i > j
+    for i = j+1:n
+        H(i,j) = A(i,j);
+        for k = 1:j-1
+            H(i,j) = H(i,j) - H(i,k)*H(j,k);
+        end
+        H(i,j) = H(i,j)/H(j,j);
+    end
+end
+end

@@ -1,0 +1,186 @@
+Rezolvarea directă a sistemelor liniare
+Abordăm în continuare câteva metode de rezolvare directă a sistemelor liniare.
+
+Metoda eliminării a lui Gauss
+%
+
+Metoda LU (fără pivotare)
+format rational
+A = [1 -1 3; 2 -3 1; 3 2 1];
+[L, U] = factorizareLUfp(A)
+B=100*rand(5,5);
+[LB, UB] = factorizareLUfp(B)
+C = [1/1000000 1 2; 3 2 1; 1 0 1];
+[LC, UC] = factorizareLUfp(C)
+%Construim o functie care rezolva sistemul Ax = b
+clear
+A = [1 -1 3;2 -3 1; 3 2 1];
+
+
+%Exemplu
+A1 = [1 2 1; 3 -1 2; 5 3 1];
+b1 = [1 2 3]
+[L, U] = factorizareLUfp(A1)
+format rational
+x1 = rezolvareLUfp(b1,L,U)
+format long
+norm(x1-A1\b1)
+
+Metoda LU (cu pivotare parțială)
+% Testul 0
+clear
+A0 = [1 2 1; 3 -1 2; 5 3 1];
+b0 = [1; 2; 3;];
+[L0, U0, P0] = factorizareLU(A0)
+z = P0*b0
+x0 = rezolvareLU(b0, L0, U0, P0)
+SolutieExacta = A0\b0
+Eroare0 = norm(x0-A0\b0)
+
+% Testul 1
+clear
+A = [2,1,1,0
+    4,3,3,1
+    8,7,9,5
+    6,7,9,8];
+
+% Determinăm mai întâi factorizarea PLU
+[L,U,P] = factorizareLU(A)
+% Determinăm eroarea factorizării
+norm(P*A-L*U)
+
+% Testul 2
+clear
+format rational
+A2 = [1 2; 3 -1];
+b2 = [1; 3];
+
+% Determinăm mai întâi factorizarea PLU
+[L,U,P] = factorizareLU(A)
+% Determinăm eroarea factorizării
+Eroare = norm(P*A-L*U)
+
+% Testul 3
+clear
+A = [eps(1.0) 3; 3 -1];
+
+% Determinăm mai întâi factorizarea PLU
+[L1,U1] = factorizareLUfp(A)
+EroareLUfp = norm(A-L1*U1)
+[L,U,P] = factorizareLU(A)
+% Determinăm eroarea factorizării
+Eroare= norm(P*A-L*U)
+
+
+
+
+
+Metoda Choleski
+%
+
+Rezolvarea sistemelor de tip bandă (EDO)
+%
+
+Funcții
+Funcția de factorizare LU (fără pivotare)
+%
+
+Funcția de factorizare LU (cu pivotare parțială)
+function [L,U,P] = factorizareLU(A)
+[~,n] = size(A);
+P = eye(n); L = eye(n); U = A;
+    for i = 1:n-1
+        [~,m] = max(abs(U(i:n,i)));
+        m = m + i - 1;
+        if m ~= i
+        %interschimb liniile m si i in P
+        temp = P(i,:);
+        P(i,:) = P(m,:);
+        P(m,:) = temp;
+        %interschimb liniile m si i in U
+        temp = U(i,:);
+        U(i,:) = U(m,:);
+        U(m,:) = temp;
+        %interschimb elementele L(m,1:i-1) si L(i,1:i-1) in L
+            if i >= 2
+                temp = L(i,1:i-1);
+                L(i,1:i-1) = L(m,1:i-1);
+                L(m,1:i-1) = temp;
+            end
+        end
+    L(i+1:n,i) = U(i+1:n,i)/U(i,i);
+    U(i+1:n,i+1:n) = U(i+1:n,i+1:n) - L(i+1:n,i)*U(i,i+1:n);
+    U(i+1:n,i) = 0;
+    end
+end
+
+Funcția de rezolvare a sistemelor via factorizarea LU (cu pivotare)
+%
+Funcția 2
+function [L, U] = factorizareLUfp(A)
+A = [1 -1 3; 2 -3 1; 3 2 1];
+s = size(A);
+n= s(1);
+for i=1:n-1 %Aplicam n-1 transformari asupra lui A
+    for j=i+1:n
+        A(j,i) = A(j,i)/A(i,i);
+    end
+    
+    for j = i+1:n
+        for k = i+1:n
+            A(j,k) = A(j,k)- A(j,i)*A(i,k);
+        end
+    end
+end
+%Construim L, copiem valorile din A
+L = eye(n); %prealocare
+for i = 2:n
+    for j = 1:i-1
+        L(i,j) = A(i,j);
+    end
+end
+%Cosntruim U, copiem valorile din A
+U = zeros(n);
+for i = 1:n
+    for j = 1:n
+        U(i,j) = A(i,j);
+    end
+end
+end
+Funcția 3 
+function y = rezolvaForward(L,b)
+n = length(b);
+y(1,1) = b(1)/l(1,1);
+for i = 2:n
+    y(i,1) = (b(i)-L(i,1:i-1)*y(1:i-1,1))./L(i,i);
+end
+end
+Funcția 4
+%
+function x = rezolvaBackward(U,y)
+m = lenght(y);
+x(m,1) = y(m)/U(m,m);
+for i = m-1:-1:1
+    x(i,1) = (y(i)-U(i,i+1:m)*x(i+1:m,1))./U(i,i);
+end
+end
+Funcția 5
+%
+[n,~] = size(L);
+
+Ux = P*b;
+    for i = 2:n
+        rez = L(i,1:i-1)*Ux(1:i-1);
+        Ux(i) = Ux(i) - rez;
+    end
+x = Ux;
+x(n) = x(n)/U(n,n);
+
+    for i = n-1:-1:1
+        rez = U(i,i+1:n)*x(i+1:n);
+        x(i) = (x(i) - rez)/U(i,i);
+    end
+end
+
+Funcția 6
+%
